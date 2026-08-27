@@ -1,0 +1,12 @@
+{
+  "name": "dse-mc-generator-proxy",
+  "private": true,
+  "description": "Optional Gemini Enterprise proxy stub for DseMcGenerator",
+  "main": "generate.proxy.stub.js",
+  "scripts": {
+    "proxy": "node generate.proxy.stub.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

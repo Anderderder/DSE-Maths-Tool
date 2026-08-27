@@ -1,0 +1,388 @@
+/* DSE MC Generator — print-friendly, exam-like UI */
+
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --muted: #5c6570;
+  --line: #d5dbe3;
+  --accent: #0b3d5c;
+  --accent-soft: #e8f1f6;
+  --danger: #9b1c1c;
+  --ok: #1b5e3b;
+  --font-ui: "Source Sans 3", "Noto Sans TC", "Segoe UI", sans-serif;
+  --font-math: "Source Serif 4", "Noto Serif TC", "Times New Roman", serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--accent);
+}
+
+.brand {
+  font-family: var(--font-math);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  margin: 0;
+}
+
+.brand-sub {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 840px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1rem 1.1rem;
+}
+
+.panel h2 {
+  margin: 0 0 0.85rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.field {
+  margin-bottom: 0.9rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.field select,
+.field input[type="password"],
+.field input[type="text"] {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: inherit;
+  background: #fff;
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.seg button {
+  border: 0;
+  background: #fff;
+  padding: 0.45rem 0.75rem;
+  font: inherit;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.seg button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.chip.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.65rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.btn-ghost {
+  background: #fff;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0.35rem 0 0;
+}
+
+.status-live {
+  margin-top: 0.65rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.settings-block {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--line);
+}
+
+.error-box {
+  background: #fdecec;
+  border: 1px solid #f0b4b4;
+  color: var(--danger);
+  padding: 0.75rem 0.9rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  white-space: pre-wrap;
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  color: var(--muted);
+  padding: 2.5rem 1rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.mcq-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1.25rem 1.35rem 1.5rem;
+}
+
+.figure-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  background: #fafafa;
+}
+
+.figure-wrap svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.figure-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.stem {
+  font-family: var(--font-math);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+  white-space: pre-wrap;
+}
+
+.options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: var(--font-math);
+  line-height: 1.45;
+}
+
+.option-key {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.option.correct-reveal {
+  border-color: var(--ok);
+  background: #f1faf5;
+}
+
+.reveal {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.reveal h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+.answer-badge {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.85rem;
+}
+
+.solution,
+.traps {
+  font-family: var(--font-math);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.traps {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* MathJax overflow */
+.math-block mjx-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell {
+    max-width: none;
+    padding: 0;
+  }
+
+  .layout {
+    display: block;
+  }
+
+  .mcq-card {
+    border: none;
+    padding: 0;
+  }
+
+  .reveal {
+    break-inside: avoid;
+  }
+}
