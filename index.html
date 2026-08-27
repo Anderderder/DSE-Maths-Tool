@@ -14,10 +14,13 @@
 <body>
   <div id="root">Loading DSE MC Generator…</div>
   <!--
-    Gemini modes:
-      browserKey (default): Settings → paste key, or window.GEMINI_API_KEY = "…"
-      proxy (Enterprise):   window.DSE_MC_GEMINI_MODE = "proxy";
-                            window.GEMINI_PROXY_URL = "http://localhost:8787/api/generate";
+    LLM modes:
+      Gemini browserKey (default): Settings → paste Gemini key, or window.GEMINI_API_KEY = "…"
+      Poe:                         Settings → paste Poe key (use start.bat for /api/poe proxy)
+                                   window.POE_API_KEY = "…"; optional window.POE_MODEL = "Gemini-2.5-Flash"
+      Force provider:              window.DSE_MC_PROVIDER = "gemini" | "poe"
+      Gemini proxy (Enterprise):   window.DSE_MC_GEMINI_MODE = "proxy";
+                                   window.GEMINI_PROXY_URL = "http://localhost:8787/api/generate";
   -->
   <script type="module">
     import('./js/app.js').catch((err) => {

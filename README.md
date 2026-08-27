@@ -4,11 +4,17 @@ HKDSE Paper 2 style multiple-choice generator. First topic: **Equation of Straig
 
 ## Run (Phase 1)
 
+Double-click `start.bat` (uses portable Node + local Poe proxy), or:
+
 ```bash
-npx serve -l 3457 "DseMcGenerator"
+node api/dev-server.mjs
 ```
 
-Open http://localhost:3457 → **Settings** → paste Gemini API key → **Generate**.
+Open http://localhost:3457 → **Settings** → paste a **Gemini** and/or **Poe** API key → **Generate**.
+
+- **Gemini only** → uses Gemini  
+- **Poe only** → uses Poe  
+- **Both** → Auto prefers Gemini (or pick in Settings)
 
 Offline UI check: Settings → **QA 1…QA 10** (no API).
 
@@ -16,10 +22,12 @@ Offline UI check: Settings → **QA 1…QA 10** (no API).
 
 | Piece | Role |
 |-------|------|
-| Gemini | Stem, options, smart exam-technique solution |
+| Gemini | Stem, options, smart exam-technique solution (browser key) |
+| Poe | Same generation path via OpenAI-compatible API + local `/api/poe` proxy |
 | `js/verify` | Reject inconsistent JSON; retry |
 | `js/graph` | Deterministic DSE-style SVG Cartesian figures |
-| `api/generate.proxy.stub.js` | Future Enterprise proxy |
+| `api/generate.proxy.stub.js` | Future Enterprise Gemini proxy |
+| `api/dev-server.mjs` | Static host + Poe CORS proxy |
 
 ## Enterprise later
 

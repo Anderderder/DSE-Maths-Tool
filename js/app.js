@@ -4,7 +4,9 @@
 import { t } from './i18n.js';
 import { TOPIC_META, DIFFICULTY } from './topics/straightLine.js';
 import { renderCartesianSvg } from './graph/cartesianSvg.js';
-import { createGeminiClient, getClientMode, getGeminiApiKey } from './gemini.js';
+import { getClientMode, getGeminiApiKey } from './gemini.js';
+import { getPoeApiKey } from './poe.js';
+import { createLlmClient, getProviderStatus } from './llm.js';
 import { generateStraightLineMcq, getAllSubtopics } from './generate.js';
 import { QA_FIXTURES } from './qa/fixtures.js';
 import { sanitizeMcqItem } from './latexSanitize.js';
@@ -72,6 +74,20 @@ function App() {
       return '';
     }
   });
+  const [poeKey, setPoeKey] = useState(() => {
+    try {
+      return getPoeApiKey();
+    } catch {
+      return '';
+    }
+  });
+  const [providerPref, setProviderPref] = useState(() => {
+    try {
+      return sessionStorage.getItem('dse_mc_provider') || 'auto';
+    } catch {
+      return 'auto';
+    }
+  });
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
@@ -99,6 +115,43 @@ function App() {
     }
   }, [apiKey]);
 
+  useEffect(() => {
+    window.__APP_POE_KEY__ = poeKey.trim();
+    try {
+      if (poeKey.trim()) sessionStorage.setItem('poe_api_key', poeKey.trim());
+      else sessionStorage.removeItem('poe_api_key');
+    } catch {
+      /* private browsing */
+    }
+  }, [poeKey]);
+
+  useEffect(() => {
+    if (providerPref === 'auto') {
+      delete window.DSE_MC_PROVIDER;
+    } else {
+      window.DSE_MC_PROVIDER = providerPref;
+    }
+    try {
+      sessionStorage.setItem('dse_mc_provider', providerPref);
+    } catch {
+      /* private browsing */
+    }
+  }, [providerPref]);
+
+  // Keep provider detection in sync with controlled inputs this render
+  window.__APP_GEMINI_KEY__ = apiKey.trim();
+  window.__APP_POE_KEY__ = poeKey.trim();
+  if (providerPref === 'auto') delete window.DSE_MC_PROVIDER;
+  else window.DSE_MC_PROVIDER = providerPref;
+
+  const providerStatus = getProviderStatus();
+  const activeProviderLabel =
+    providerStatus.provider === 'gemini'
+      ? t(lang, 'providerGemini')
+      : providerStatus.provider === 'poe'
+        ? t(lang, 'providerPoe')
+        : t(lang, 'providerNone');
+
   const typesetKey = item
     ? `${item.stem_latex}|${JSON.stringify(item.options)}|${item.smart_solution_latex}|${reveal}`
     : '';
@@ -110,7 +163,7 @@ function App() {
     setReveal(false);
     setStatus(t(lang, 'statusStarting'));
     try {
-      const client = createGeminiClient();
+      const client = createLlmClient();
       const { item: next } = await generateStraightLineMcq({
         language: lang,
         difficulty,
@@ -315,13 +368,40 @@ function App() {
                       autoComplete: 'off',
                       value: apiKey,
                       onChange: (e) => setApiKey(e.target.value),
-                      placeholder: 'AQ.… or AIza…',
+                      placeholder: 'AIza…',
                     }),
                     h(
                       'p',
                       { className: 'hint' },
                       apiKey.trim() ? t(lang, 'apiKeySaved') : t(lang, 'apiKeyHint'),
                     ),
+                    h('label', { htmlFor: 'poeKey', style: { marginTop: '0.75rem' } }, t(lang, 'poeApiKey')),
+                    h('input', {
+                      id: 'poeKey',
+                      type: 'password',
+                      autoComplete: 'off',
+                      value: poeKey,
+                      onChange: (e) => setPoeKey(e.target.value),
+                      placeholder: 'poe-…',
+                    }),
+                    h(
+                      'p',
+                      { className: 'hint' },
+                      poeKey.trim() ? t(lang, 'poeApiKeySaved') : t(lang, 'poeApiKeyHint'),
+                    ),
+                    h('label', { htmlFor: 'providerPref', style: { marginTop: '0.75rem' } }, t(lang, 'providerActive')),
+                    h(
+                      'select',
+                      {
+                        id: 'providerPref',
+                        value: providerPref,
+                        onChange: (e) => setProviderPref(e.target.value),
+                      },
+                      h('option', { value: 'auto' }, t(lang, 'providerAuto')),
+                      h('option', { value: 'gemini' }, t(lang, 'providerGemini')),
+                      h('option', { value: 'poe' }, t(lang, 'providerPoe')),
+                    ),
+                    h('p', { className: 'hint' }, `${t(lang, 'providerActive')}: ${activeProviderLabel}`),
                     h('p', { className: 'hint' }, t(lang, 'demoHint')),
                     h(
                       'div',

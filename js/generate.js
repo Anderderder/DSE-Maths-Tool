@@ -2,7 +2,7 @@
  * Generate + verify loop for Straight Line MC items.
  * Intercept I/II/III: locked local maths + exam-technique smart solution (no AI decimals).
  */
-import { createGeminiClient } from './gemini.js';
+import { createLlmClient } from './llm.js';
 import {
   RESPONSE_SCHEMA,
   loadSystemPrompt,
@@ -60,7 +60,7 @@ async function generateInterceptIiiMcq(opts) {
  *   language: 'en'|'zh',
  *   difficulty: string,
  *   subtopicId: string|null,
- *   client?: ReturnType<typeof createGeminiClient>,
+ *   client?: { generateContent: Function, provider?: string },
  *   onProgress?: (msg: string) => void,
  * }} opts
  */
@@ -76,8 +76,9 @@ export async function generateStraightLineMcq(opts) {
     return generateInterceptIiiMcq({ ...opts, subtopicId: id });
   }
 
-  const client = opts.client || createGeminiClient();
+  const client = opts.client || createLlmClient();
   const onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : () => {};
+  const providerLabel = client.provider === 'poe' ? 'Poe' : 'Gemini';
 
   onProgress('Loading prompt…');
   const systemPrompt = await loadSystemPrompt();
@@ -92,7 +93,7 @@ export async function generateStraightLineMcq(opts) {
       retryFeedback: retryFeedback || undefined,
     });
 
-    onProgress(`Calling Gemini… (attempt ${attempt}/${MAX_VERIFY_ATTEMPTS})`);
+    onProgress(`Calling ${providerLabel}… (attempt ${attempt}/${MAX_VERIFY_ATTEMPTS})`);
     const raw = await client.generateContent({
       systemPrompt,
       userText,
